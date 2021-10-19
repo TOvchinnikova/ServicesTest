@@ -5,10 +5,12 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
+import android.app.job.JobWorkItem
 import android.content.ComponentName
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.t_ovchinnikova.servicestest.databinding.ActivityMainBinding
@@ -19,11 +21,12 @@ class MainActivity : AppCompatActivity() {
         ActivityMainBinding.inflate(layoutInflater)
     }
 
+    private var page = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         binding.simpleService.setOnClickListener {
-            stopService(MyForegroundService.newIntent(this))
             startService(MyService.newIntent(this, 25))
         }
         binding.foregroundService.setOnClickListener {
@@ -44,12 +47,17 @@ class MainActivity : AppCompatActivity() {
             val jobInfo = JobInfo.Builder(MyJobService.JOB_ID, componentName)
                 .setRequiresCharging(true) //требуется зарядка
                 .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED) //требуется вай-фай
-                .setPersisted(true) //если мы хотим, чтобы сервис запускался даже после того как устройство выключили и включили
+                //.setPersisted(true) //если мы хотим, чтобы сервис запускался даже после того как устройство выключили и включили
                 .build()
 
             val jobScheduler = getSystemService(JOB_SCHEDULER_SERVICE) as JobScheduler
-            jobScheduler.schedule(jobInfo)
+            //jobScheduler.schedule(jobInfo) //при запуске нового сервиса, запущенный прервется, работу начнет новый, т.е. нет очереди
 
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                Log.d("SERVICE_TAG", "1233456")
+                val intent = MyJobService.newIntent(page++)
+                jobScheduler.enqueue(jobInfo, JobWorkItem(intent))
+            }
         }
     }
 }
