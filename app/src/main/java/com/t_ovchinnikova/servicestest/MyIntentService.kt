@@ -11,8 +11,6 @@ import kotlinx.coroutines.*
 
 class MyIntentService : IntentService(NAME) {
 
-    private val coroutineScope = CoroutineScope(Dispatchers.Main)
-
     override fun onCreate() {
         super.onCreate()
         log("onCreate")

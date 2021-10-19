@@ -57,6 +57,10 @@ class MainActivity : AppCompatActivity() {
                 Log.d("SERVICE_TAG", "1233456")
                 val intent = MyJobService.newIntent(page++)
                 jobScheduler.enqueue(jobInfo, JobWorkItem(intent))
+            } else {
+                Log.d("SERVICE_TAG", "fghgfhfg")
+                val intent = MyIntentService2.newIntent(this, page++)
+                startService(intent)
             }
         }
     }
