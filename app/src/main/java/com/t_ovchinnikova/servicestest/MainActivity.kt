@@ -1,8 +1,6 @@
 package com.t_ovchinnikova.servicestest
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
+import android.app.*
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
 import android.app.job.JobWorkItem
@@ -15,9 +13,11 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.getSystemService
 import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkManager
 import com.t_ovchinnikova.servicestest.databinding.ActivityMainBinding
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -88,6 +88,18 @@ class MainActivity : AppCompatActivity() {
                 MyWorker.WORK_NAME,
                 ExistingWorkPolicy.APPEND, //что делать, если какой-то воркер был уже запущен и мы запускаем новый
                 MyWorker.makeRequest(page++)
+            )
+        }
+        binding.alarmManager.setOnClickListener {
+            val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
+            val calendar = Calendar.getInstance()
+            calendar.add(Calendar.SECOND, 30)
+            val intent = AlarmReceiver.newIntent(this)
+            val pendingIntent = PendingIntent.getBroadcast(this, 100, intent, 0)
+            alarmManager.setExact(
+                AlarmManager.RTC_WAKEUP,
+                calendar.timeInMillis,
+                pendingIntent
             )
         }
     }
